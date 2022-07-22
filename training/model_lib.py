@@ -23,8 +23,8 @@ analysis or custom losses.
 """
 
 import gin.tf
-from ..models.film_net import interpolator as film_net_interpolator
-from ..models.film_net import options as film_net_options
+from models.film_net import interpolator as film_net_interpolator
+from models.film_net import options as film_net_options
 
 import tensorflow as tf
 
@@ -47,7 +47,9 @@ def _create_film_net_model() -> tf.keras.Model:
       shape=(None, None, 3), batch_size=None, dtype=tf.float32, name='x0')
   x1 = tf.keras.Input(
       shape=(None, None, 3), batch_size=None, dtype=tf.float32, name='x1')
+  i0 = tf.keras.Input(
+      shape=(None, None, 3), batch_size=None, dtype=tf.float32, name='i0')
   time = tf.keras.Input(
       shape=(1,), batch_size=None, dtype=tf.float32, name='time')
 
-  return film_net_interpolator.create_model(x0, x1, time, options)
+  return film_net_interpolator.create_model(x0, x1, i0, time, options)

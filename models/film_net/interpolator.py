@@ -86,7 +86,7 @@ from . import util
 import tensorflow as tf
 
 
-def create_model(x0: tf.Tensor, x1: tf.Tensor, time: tf.Tensor,
+def create_model(x0: tf.Tensor, x1: tf.Tensor, i0: tf.Tensor, time: tf.Tensor,
                  config: options.Options) -> tf.keras.Model:
   """Creates a frame interpolator model.
 
@@ -123,26 +123,30 @@ def create_model(x0: tf.Tensor, x1: tf.Tensor, time: tf.Tensor,
 
   x0_decoded = x0
   x1_decoded = x1
+  i0_decoded = i0
 
   # shuffle images
   image_pyramids = [
       util.build_image_pyramid(x0_decoded, config),
-      util.build_image_pyramid(x1_decoded, config)
+      util.build_image_pyramid(x1_decoded, config),
+      util.build_image_pyramid(i0_decoded, config)
   ]
 
   # Siamese feature pyramids:
   extract = feature_extractor.FeatureExtractor('feat_net', config)
-  feature_pyramids = [extract(image_pyramids[0]), extract(image_pyramids[1])]
+  feature_pyramids = [extract(image_pyramids[0]), extract(image_pyramids[1]), extract(image_pyramids[2])]
 
   predict_flow = pyramid_flow_estimator.PyramidFlowEstimator(
       'predict_flow', config)
 
   # Predict forward flow.
   forward_residual_flow_pyramid = predict_flow(feature_pyramids[0],
-                                               feature_pyramids[1])
+                                               feature_pyramids[1],
+                                               feature_pyramids[2])
   # Predict backward flow.
   backward_residual_flow_pyramid = predict_flow(feature_pyramids[1],
-                                                feature_pyramids[0])
+                                                feature_pyramids[1],
+                                                feature_pyramids[2])
 
   # Concatenate features and images:
 
@@ -202,6 +206,7 @@ def create_model(x0: tf.Tensor, x1: tf.Tensor, time: tf.Tensor,
       inputs={
           'x0': x0,
           'x1': x1,
+          'i0': i0,
           'time': time
       }, outputs=outputs)
   return model
