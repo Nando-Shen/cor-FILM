@@ -92,7 +92,7 @@ class FlowEstimator(tf.keras.layers.Layer):
     Returns:
       A tensor with optical flow from A to B
     """
-    net = tf.concat([features_a, features_b, features_c], axis=-1)
+    net = tf.concat([features_a, features_b], axis=-1)
     for conv in self._convs:
       net = conv(net)
     return net
