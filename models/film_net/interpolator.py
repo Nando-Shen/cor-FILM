@@ -145,7 +145,7 @@ def create_model(x0: tf.Tensor, x1: tf.Tensor, i0: tf.Tensor, time: tf.Tensor,
                                                feature_pyramids[2])
   # Predict backward flow.
   backward_residual_flow_pyramid = predict_flow(feature_pyramids[1],
-                                                feature_pyramids[1],
+                                                feature_pyramids[0],
                                                 feature_pyramids[2])
 
   # Concatenate features and images:
