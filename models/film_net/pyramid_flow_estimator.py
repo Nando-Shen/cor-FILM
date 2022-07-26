@@ -82,7 +82,7 @@ class FlowEstimator(tf.keras.layers.Layer):
     self._convs.append(
         conv(filters=2, size=1, name=f'conv_{i+2}', activation=None))
 
-  def call(self, features_a: tf.Tensor, features_b: tf.Tensor, features_c: tf.Tensor) -> tf.Tensor:
+  def call(self, features_a: tf.Tensor, features_b: tf.Tensor) -> tf.Tensor:
     """Estimates optical flow between two images.
 
     Args:
@@ -123,8 +123,9 @@ class PyramidFlowEstimator(tf.keras.layers.Layer):
       self._predictors.append(shared_predictor)
 
   def call(self, feature_pyramid_a: List[tf.Tensor],
-           feature_pyramid_b: List[tf.Tensor],
-           feature_pyramid_c: List[tf.Tensor]) -> List[tf.Tensor]:
+           feature_pyramid_b: List[tf.Tensor]) -> List[tf.Tensor]:
+           # feature_pyramid_c: List[tf.Tensor]) -> List[tf.Tensor]:
+
     """Estimates residual flow pyramids between two image pyramids.
 
     Each image pyramid is represented as a list of tensors in fine-to-coarse
@@ -147,7 +148,7 @@ class PyramidFlowEstimator(tf.keras.layers.Layer):
       residual against zero).
     """
     levels = len(feature_pyramid_a)
-    v = self._predictors[-1](feature_pyramid_a[-1], feature_pyramid_b[-1], feature_pyramid_c[-1])
+    v = self._predictors[-1](feature_pyramid_a[-1], feature_pyramid_b[-1])
     residuals = [v]
     for i in reversed(range(0, levels-1)):
       # Upsamples the flow to match the current pyramid level. Also, scales the
@@ -156,10 +157,11 @@ class PyramidFlowEstimator(tf.keras.layers.Layer):
       v = tf.image.resize(images=2*v, size=level_size)
       # Warp feature_pyramid_b[i] image based on the current flow estimate.
       warped = util.warp(feature_pyramid_b[i], v)
-      warped_i = util.warp(feature_pyramid_c[i], v)
+      # warped_i = util.warp(feature_pyramid_c[i], v)
 
       # Estimate the residual flow between pyramid_a[i] and warped image:
-      v_residual = self._predictors[i](feature_pyramid_a[i], warped, warped_i)
+      v_residual = self._predictors[i](feature_pyramid_a[i], warped)
+      # v_residual = self._predictors[i](feature_pyramid_a[i], warped, warped_i)
       residuals.append(v_residual)
       v = v_residual + v
     # Use reversed() to return in the 'standard' finest-first-order:
