@@ -14,8 +14,8 @@
 # ==============================================================================
 model.name = 'film_net'
 
-film_net.pyramid_levels = 6
-film_net.fusion_pyramid_levels = 4
+film_net.pyramid_levels = 7
+film_net.fusion_pyramid_levels = 5
 film_net.specialized_levels = 3
 film_net.sub_levels = 4
 film_net.flow_convs = [3, 3, 3, 3]
