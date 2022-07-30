@@ -184,7 +184,7 @@ def create_model(x0: tf.Tensor, x1: tf.Tensor, i0: tf.Tensor, time: tf.Tensor,
                                               backward_warped_pyramid)
   aligned_pyramid = util.concatenate_pyramids(aligned_pyramid, backward_flow)
   aligned_pyramid = util.concatenate_pyramids(aligned_pyramid, forward_flow)
-  aligned_pyramid = util.concatenate_pyramids(aligned_pyramid, feature_pyramids[2])
+  # aligned_pyramid = util.concatenate_pyramids(aligned_pyramid, feature_pyramids[2])
 
   fuse = fusion.Fusion('fusion', config)
   prediction = fuse(aligned_pyramid)
