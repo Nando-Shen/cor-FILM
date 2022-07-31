@@ -92,7 +92,7 @@ class FlowEstimator(tf.keras.layers.Layer):
     Returns:
       A tensor with optical flow from A to B
     """
-    net = tf.concat([features_a, features_b, features_c], axis=-1)
+    net = tf.concat([features_a, features_b], axis=-1)
     for conv in self._convs:
       net = conv(net)
     return net
@@ -157,11 +157,11 @@ class PyramidFlowEstimator(tf.keras.layers.Layer):
       v = tf.image.resize(images=2*v, size=level_size)
       # Warp feature_pyramid_b[i] image based on the current flow estimate.
       warped = util.warp(feature_pyramid_b[i], v)
-      warped_i = util.warp(feature_pyramid_c[i], v)
+      # warped_i = util.warp(feature_pyramid_c[i], v)
 
       # Estimate the residual flow between pyramid_a[i] and warped image:
-      # v_residual = self._predictors[i](feature_pyramid_a[i], warped)
-      v_residual = self._predictors[i](feature_pyramid_a[i], warped, warped_i)
+      v_residual = self._predictors[i](feature_pyramid_a[i], warped)
+      # v_residual = self._predictors[i](feature_pyramid_a[i], warped, warped_i)
       residuals.append(v_residual)
       v = v_residual + v
     # Use reversed() to return in the 'standard' finest-first-order:
