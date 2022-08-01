@@ -78,7 +78,8 @@ def _parse_example(sample):
   output_dict = {
       'x0': tf.io.decode_image(features['frame_0/encoded'], dtype=tf.float32),
       'x1': tf.io.decode_image(features['frame_2/encoded'], dtype=tf.float32),
-      'i0': tf.io.decode_image(features['inter/encoded'], dtype=tf.float32),
+      # 'i0': tf.io.decode_image(features['inter/encoded'], dtype=tf.float32),
+      'i0': tf.io.decode_image(features['frame_1/encoded'], dtype=tf.float32),
       'y': tf.io.decode_image(features['frame_1/encoded'], dtype=tf.float32),
       # The fractional time value of frame_1 is not included in our tfrecords,
       # but is always at 0.5. The model will expect this to be specificed, so
