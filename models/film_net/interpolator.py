@@ -171,7 +171,9 @@ def create_model(x0: tf.Tensor, x1: tf.Tensor, i0: tf.Tensor, time: tf.Tensor,
       util.concatenate_pyramids(image_pyramids[0][:fusion_pyramid_levels],
                                 feature_pyramids[0][:fusion_pyramid_levels]),
       util.concatenate_pyramids(image_pyramids[1][:fusion_pyramid_levels],
-                                feature_pyramids[1][:fusion_pyramid_levels])
+                                feature_pyramids[1][:fusion_pyramid_levels]),
+      util.concatenate_pyramids(image_pyramids[2][:fusion_pyramid_levels],
+                                feature_pyramids[2][:fusion_pyramid_levels])
   ]
 
   # Warp features and images using the flow. Note that we use backward warping
@@ -179,12 +181,13 @@ def create_model(x0: tf.Tensor, x1: tf.Tensor, i0: tf.Tensor, time: tf.Tensor,
   # image 1.
   forward_warped_pyramid = util.pyramid_warp(pyramids_to_warp[0], backward_flow)
   backward_warped_pyramid = util.pyramid_warp(pyramids_to_warp[1], forward_flow)
+  inter_warped_pyramid = util.pyramid_warp(pyramids_to_warp[2], forward_flow)
 
   aligned_pyramid = util.concatenate_pyramids(forward_warped_pyramid,
                                               backward_warped_pyramid)
   aligned_pyramid = util.concatenate_pyramids(aligned_pyramid, backward_flow)
   aligned_pyramid = util.concatenate_pyramids(aligned_pyramid, forward_flow)
-  aligned_pyramid = util.concatenate_pyramids(aligned_pyramid, feature_pyramids[2])
+  aligned_pyramid = util.concatenate_pyramids(aligned_pyramid, inter_warped_pyramid)
 
   fuse = fusion.Fusion('fusion', config)
   prediction = fuse(aligned_pyramid)
