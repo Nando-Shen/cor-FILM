@@ -138,6 +138,8 @@ def concatenate_pyramids(pyramid1: List[tf.Tensor],
                          pyramid2: List[tf.Tensor]) -> List[tf.Tensor]:
   """Concatenates each pyramid level together in the channel dimension."""
   result = []
+  print(len(pyramid1))
+  print(len(pyramid2))
   for features1, features2 in zip(pyramid1, pyramid2):
     result.append(tf.concat([features1, features2], axis=-1))
   return result
